@@ -1,0 +1,19 @@
+{
+  "name": "anomaly-flagged-no-case-deny",
+  "description": "PR touches a file flagged with severity 0.92 but no broken-to-better case exists — kernel must deny.",
+  "pr_number": 504,
+  "commit_sha": "aaaa1111bbbb2222",
+  "actor": "dev-eve",
+  "mode": "merge",
+  "emergency": false,
+  "diff_text": "diff --git a/src/models/base.py b/src/models/base.py\n+# refactored model\n",
+  "ci_artifacts": {
+    "pytest": {"exit_code": 0},
+    "ruff": "pass",
+    "mypy": "pass"
+  },
+  "anomalies": [
+    {"file": "src/models/base.py", "severity": 0.92, "label": "structural drift"}
+  ],
+  "expected_decision": "deny"
+}

@@ -1,0 +1,8 @@
+{
+  "total_decisions": 0,
+  "approvals": 0,
+  "denials": 0,
+  "emergency_bypasses": 0,
+  "failures_by_invariant": {},
+  "total_elapsed_ms": 0
+}

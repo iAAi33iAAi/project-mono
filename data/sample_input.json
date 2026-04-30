@@ -1,0 +1,9 @@
+{
+  "user_id": "u-00000001",
+  "action": "process",
+  "payload": {
+    "name": "Example Item",
+    "quantity": 42,
+    "tags": ["demo", "seed"]
+  }
+}

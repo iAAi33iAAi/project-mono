@@ -1,0 +1,16 @@
+{
+  "name": "emergency-bypass-approve",
+  "description": "Hotfix with failing tests but --emergency flag set — kernel approves with retrospective mandate.",
+  "pr_number": 503,
+  "commit_sha": "e0e0e0e0e0e0e0e0",
+  "actor": "oncall-dave",
+  "mode": "deploy",
+  "emergency": true,
+  "diff_text": "diff --git a/src/api/routes.py b/src/api/routes.py\n+# hotfix: patch auth bypass\n",
+  "ci_artifacts": {
+    "pytest": {"exit_code": 1, "tests_passed": false},
+    "ruff": "pass",
+    "mypy": "pass"
+  },
+  "expected_decision": "approve"
+}

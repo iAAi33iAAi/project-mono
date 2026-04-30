@@ -1,0 +1,25 @@
+{
+  "name": "infra-protected-destroy-deny",
+  "description": "Terraform plan deletes an RDS cluster — kernel must deny without Approver sign-off.",
+  "pr_number": 502,
+  "commit_sha": "ff00ff00ff00ff00",
+  "actor": "ops-carol",
+  "mode": "merge",
+  "emergency": false,
+  "diff_text": "diff --git a/infra/terraform/main.tf b/infra/terraform/main.tf\n-resource \"aws_rds_cluster\" \"prod\" {}\n",
+  "ci_artifacts": {
+    "pytest": {"exit_code": 0},
+    "ruff": "pass",
+    "mypy": "pass",
+    "terraform_plan": {
+      "resource_changes": [
+        {
+          "address": "aws_rds_cluster.prod",
+          "type": "aws_rds_cluster",
+          "change": {"actions": ["delete"]}
+        }
+      ]
+    }
+  },
+  "expected_decision": "deny"
+}

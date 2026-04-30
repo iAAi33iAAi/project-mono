@@ -1,0 +1,16 @@
+{
+  "name": "clean-merge-all-pass",
+  "description": "Standard PR with all CI green, no secrets, no infra changes.",
+  "pr_number": 500,
+  "commit_sha": "aabbccdd11223344",
+  "actor": "dev-alice",
+  "mode": "merge",
+  "emergency": false,
+  "diff_text": "diff --git a/src/utils/helpers.py b/src/utils/helpers.py\n+def new_helper():\n+    return True\n",
+  "ci_artifacts": {
+    "pytest": {"exit_code": 0, "tests_passed": true},
+    "ruff": "pass",
+    "mypy": "pass"
+  },
+  "expected_decision": "approve"
+}

@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-mono
+  labels:
+    app: project-mono
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: project-mono
+  template:
+    metadata:
+      labels:
+        app: project-mono
+    spec:
+      containers:
+        - name: app
+          image: project-mono:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: project-mono-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

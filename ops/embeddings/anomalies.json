@@ -1,0 +1,8 @@
+[
+  {
+    "file": "src/models/base.py",
+    "severity": 0.42,
+    "label": "minor structural drift",
+    "detected_at": "2026-04-28T10:00:00Z"
+  }
+]

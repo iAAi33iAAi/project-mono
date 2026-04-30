@@ -1,0 +1,65 @@
+{
+  "_comment": "CODEX role-mapping — maps GitHub actors/teams to governance roles and kernel enforcement flags.",
+
+  "global": {
+    "require_gpg_for_deploy": false,
+    "emergency_retrospective_hours": 48,
+    "min_approvers_for_infra": 2,
+    "min_approvers_for_src": 1
+  },
+
+  "roles": {
+    "developer": {
+      "description": "Standard contributor — can open PRs, run tests, request merges.",
+      "permissions": ["merge:src", "merge:docs", "merge:experiments"]
+    },
+    "infra-operator": {
+      "description": "Can propose and merge infrastructure changes with Approver sign-off.",
+      "permissions": ["merge:infra", "apply:staging"]
+    },
+    "deployer": {
+      "description": "Can trigger production deploys. GPG optional unless global flag set.",
+      "permissions": ["deploy:staging", "deploy:production"],
+      "require_gpg": false
+    },
+    "approver": {
+      "description": "Senior reviewer — required sign-off for protected resource changes.",
+      "permissions": ["approve:infra", "approve:security", "approve:emergency"]
+    },
+    "admin": {
+      "description": "Full access including emergency bypass and kernel configuration.",
+      "permissions": ["*"],
+      "require_gpg": false
+    }
+  },
+
+  "actors": {
+    "_example_alice": {
+      "role": "developer",
+      "teams": ["backend"],
+      "require_gpg": false
+    },
+    "_example_bob": {
+      "role": "infra-operator",
+      "teams": ["platform"],
+      "require_gpg": false
+    },
+    "_example_carol": {
+      "role": "approver",
+      "teams": ["leads"],
+      "require_gpg": false
+    }
+  },
+
+  "teams": {
+    "backend": {
+      "default_role": "developer"
+    },
+    "platform": {
+      "default_role": "infra-operator"
+    },
+    "leads": {
+      "default_role": "approver"
+    }
+  }
+}

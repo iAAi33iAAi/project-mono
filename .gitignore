@@ -1,0 +1,61 @@
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+*.egg
+
+# ---------- Node / Frontend ----------
+node_modules/
+frontend/dist/
+frontend/build/
+.npm
+.yarn/
+
+# ---------- IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
+
+# ---------- Environment & secrets ----------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ---------- Data (keep structure, ignore large files) ----------
+data/*.csv
+data/*.parquet
+data/*.json
+!data/README.md
+!data/.gitkeep
+
+# ---------- Terraform ----------
+infra/terraform/.terraform/
+infra/terraform/*.tfstate
+infra/terraform/*.tfstate.backup
+infra/terraform/.terraform.lock.hcl
+
+# ---------- Docker ----------
+docker-compose.override.yml
+
+# ---------- Jupyter ----------
+.ipynb_checkpoints/
+experiments/notebooks/.ipynb_checkpoints/
+
+# ---------- Coverage / test ----------
+.coverage
+htmlcov/
+.pytest_cache/

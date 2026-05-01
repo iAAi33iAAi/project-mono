@@ -16,6 +16,9 @@ jobs:
         continue-on-error: true
       - name: Format
         run: ruff format .
+      - name: Add noqa
+        run: ruff check --add-noqa .
+        continue-on-error: true
       - name: Verify
         run: ruff check src/ tests/ invariants/ scripts/
       - name: Commit

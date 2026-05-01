@@ -5,7 +5,11 @@ Writes use a temp-file-then-rename strategy so a crash never
 corrupts existing entries.
 """
 from __future__ import annotations
-import json, os, tempfile
+
+import contextlib
+import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -44,10 +48,8 @@ def append_decision(record: dict[str, Any], ledger_path: Path) -> None:
             os.fsync(fh.fileno())
         os.replace(tmp_path, str(ledger_path))
     except BaseException:
-        try:
+        with contextlib.suppress(OSError):
             os.unlink(tmp_path)
-        except OSError:
-            pass
         raise
 
 

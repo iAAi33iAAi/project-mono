@@ -8,14 +8,19 @@ Knowledge Ledger.
 Exit codes: 0 approved, 1 denied, 2 internal error.
 """
 from __future__ import annotations
-import argparse, json, sys, time
-from datetime import datetime, timezone
+
+import argparse
+import json
+import sys
+import time
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 from uuid import uuid4
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
+import contextlib
+
 from invariants import KERNEL_VERSION, InvariantResult, load_invariants
 from scripts.ledger_append import append_decision
 
@@ -45,7 +50,7 @@ def _build_context(args):
 def _make_record(ctx, results, decision, reason, remediations, elapsed_ms):
     return {
         "decision_id": str(uuid4()),
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "actor": ctx["actor"], "pr_number": ctx["pr_number"],
         "commit_sha": ctx["commit_sha"], "mode": ctx["mode"],
         "emergency": ctx["emergency"],
@@ -124,10 +129,8 @@ def run(argv=None):
     except Exception as exc:
         print(f"[KERNEL ERROR] ledger write failed: {exc}", file=sys.stderr)
         return 2
-    try:
+    with contextlib.suppress(Exception):
         _update_metrics(Path(args.metrics), record)
-    except Exception:
-        pass
     print(json.dumps(record, indent=2))
     return 0 if decision == "approve" else 1
 

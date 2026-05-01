@@ -1,18 +1,20 @@
 """Kernel integration tests for ALGA_FOLD_KERNEL."""
 
-import json, sys, textwrap
+import json
+import sys
 from pathlib import Path
 from uuid import uuid4
+
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from invariants import load_invariants, BaseInvariant, KERNEL_VERSION
-from invariants.no_secrets import NoSecretsInvariant
-from invariants.tests_and_types import TestsAndTypesInvariant
-from invariants.infra_plan_check import InfraPlanCheckInvariant
-from scripts.ledger_append import append_decision, read_ledger
+from invariants import KERNEL_VERSION, BaseInvariant, load_invariants # noqa: E402
+from invariants.infra_plan_check import InfraPlanCheckInvariant # noqa: E402
+from invariants.no_secrets import NoSecretsInvariant # noqa: E402
+from invariants.tests_and_types import TestsAndTypesInvariant # noqa: E402
+from scripts.ledger_append import append_decision, read_ledger # noqa: E402
 
 
 def _ctx(tmp_path, *, diff="", ci=None, files=None, emergency=False):

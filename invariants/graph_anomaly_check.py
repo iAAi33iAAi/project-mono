@@ -105,7 +105,7 @@ class GraphAnomalyCheckInvariant(BaseInvariant):
             name=self.name,
             status="fail",
             details=(
-                f"anomaly-flagged files touched without a case: "
+                "anomaly-flagged files touched without a case: "
                 + "; ".join(detail_parts)
             ),
             remediation=[

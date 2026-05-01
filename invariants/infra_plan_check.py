@@ -17,23 +17,25 @@ from typing import Any
 from invariants import BaseInvariant, InvariantResult
 
 # Resource types that require extra scrutiny before deletion
-_PROTECTED_RESOURCE_TYPES = frozenset({
-    "aws_db_instance",
-    "aws_rds_cluster",
-    "aws_s3_bucket",
-    "aws_iam_role",
-    "aws_iam_policy",
-    "aws_security_group",
-    "aws_vpc",
-    "aws_subnet",
-    "aws_elasticache_cluster",
-    "aws_eks_cluster",
-    "aws_lambda_function",
-    "google_sql_database_instance",
-    "google_compute_network",
-    "azurerm_resource_group",
-    "azurerm_sql_server",
-})
+_PROTECTED_RESOURCE_TYPES = frozenset(
+    {
+        "aws_db_instance",
+        "aws_rds_cluster",
+        "aws_s3_bucket",
+        "aws_iam_role",
+        "aws_iam_policy",
+        "aws_security_group",
+        "aws_vpc",
+        "aws_subnet",
+        "aws_elasticache_cluster",
+        "aws_eks_cluster",
+        "aws_lambda_function",
+        "google_sql_database_instance",
+        "google_compute_network",
+        "azurerm_resource_group",
+        "azurerm_sql_server",
+    }
+)
 
 
 class InfraPlanCheckInvariant(BaseInvariant):
@@ -69,9 +71,7 @@ class InfraPlanCheckInvariant(BaseInvariant):
             )
 
         # ── analyse plan ───────────────────────────────────────────────
-        resource_changes: list[dict[str, Any]] = plan.get(
-            "resource_changes", []
-        )
+        resource_changes: list[dict[str, Any]] = plan.get("resource_changes", [])
         destroy_count = 0
         protected_deletions: list[str] = []
         all_deletions: list[str] = []
@@ -90,23 +90,13 @@ class InfraPlanCheckInvariant(BaseInvariant):
                     protected_deletions.append(r_addr)
 
         if protected_deletions:
-            findings.append(
-                f"protected resource deletions: {', '.join(protected_deletions)}"
-            )
-            remediation.append(
-                "obtain explicit Approver sign-off for protected resource deletions"
-            )
-            remediation.append(
-                "verify deletions are intentional and data has been migrated"
-            )
+            findings.append(f"protected resource deletions: {', '.join(protected_deletions)}")
+            remediation.append("obtain explicit Approver sign-off for protected resource deletions")
+            remediation.append("verify deletions are intentional and data has been migrated")
 
         if destroy_count > 0 and not protected_deletions:
-            findings.append(
-                f"{destroy_count} resource deletion(s): {', '.join(all_deletions[:5])}"
-            )
-            remediation.append(
-                "confirm resource deletions are intentional"
-            )
+            findings.append(f"{destroy_count} resource deletion(s): {', '.join(all_deletions[:5])}")
+            remediation.append("confirm resource deletions are intentional")
 
         # Check for security group / IAM changes (even non-delete)
         security_changes: list[str] = []
@@ -114,17 +104,13 @@ class InfraPlanCheckInvariant(BaseInvariant):
             r_type = rc.get("type", "")
             r_addr = rc.get("address", "")
             actions = rc.get("change", {}).get("actions", [])
-            if any(kw in r_type for kw in ("iam", "security_group", "firewall")):
+            if any(kw in r_type for kw in ("iam", "security_group", "firewall")):  # noqa: SIM102
                 if any(a in actions for a in ("create", "update", "delete")):
                     security_changes.append(f"{r_addr} ({', '.join(actions)})")
 
         if security_changes:
-            findings.append(
-                f"security-sensitive changes: {'; '.join(security_changes[:5])}"
-            )
-            remediation.append(
-                "review IAM/security-group changes with security team"
-            )
+            findings.append(f"security-sensitive changes: {'; '.join(security_changes[:5])}")
+            remediation.append("review IAM/security-group changes with security team")
 
         if findings:
             return InvariantResult(
@@ -135,12 +121,10 @@ class InfraPlanCheckInvariant(BaseInvariant):
             )
 
         add_count = sum(
-            1 for rc in resource_changes
-            if "create" in rc.get("change", {}).get("actions", [])
+            1 for rc in resource_changes if "create" in rc.get("change", {}).get("actions", [])
         )
         update_count = sum(
-            1 for rc in resource_changes
-            if "update" in rc.get("change", {}).get("actions", [])
+            1 for rc in resource_changes if "update" in rc.get("change", {}).get("actions", [])
         )
 
         return InvariantResult(

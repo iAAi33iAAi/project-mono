@@ -13,4 +13,5 @@ async def health() -> dict:
 @router.get("/version")
 async def version() -> dict:
     from src import __version__
+
     return {"version": __version__}

@@ -18,20 +18,20 @@ from invariants import BaseInvariant, InvariantResult
 
 # ── patterns ─────────────────────────────────────────────────────────
 _SECRET_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("AWS Access Key",      re.compile(r"AKIA[0-9A-Z]{16}")),
-    ("AWS Secret Key",      re.compile(r"(?i)aws_secret_access_key\s*[=:]\s*\S{20,}")),
-    ("GitHub Token",        re.compile(r"ghp_[A-Za-z0-9]{36}")),
-    ("GitHub OAuth",        re.compile(r"gho_[A-Za-z0-9]{36}")),
-    ("Generic API Key",     re.compile(r"(?i)(api[_-]?key|apikey)\s*[=:]\s*['\"]?\S{16,}")),
-    ("Private Key Block",   re.compile(r"-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----")),
-    ("Generic Secret",      re.compile(r"(?i)(secret|password|passwd|token)\s*[=:]\s*['\"]?\S{8,}")),
-    ("Slack Token",         re.compile(r"xox[bpoas]-[0-9A-Za-z-]{10,}")),
-    ("Stripe Key",          re.compile(r"sk_live_[0-9a-zA-Z]{24,}")),
+    ("AWS Access Key", re.compile(r"AKIA[0-9A-Z]{16}")),
+    ("AWS Secret Key", re.compile(r"(?i)aws_secret_access_key\s*[=:]\s*\S{20,}")),
+    ("GitHub Token", re.compile(r"ghp_[A-Za-z0-9]{36}")),
+    ("GitHub OAuth", re.compile(r"gho_[A-Za-z0-9]{36}")),
+    ("Generic API Key", re.compile(r"(?i)(api[_-]?key|apikey)\s*[=:]\s*['\"]?\S{16,}")),
+    ("Private Key Block", re.compile(r"-----BEGIN\s+(RSA\s+)?PRIVATE\s+KEY-----")),
+    ("Generic Secret", re.compile(r"(?i)(secret|password|passwd|token)\s*[=:]\s*['\"]?\S{8,}")),
+    ("Slack Token", re.compile(r"xox[bpoas]-[0-9A-Za-z-]{10,}")),
+    ("Stripe Key", re.compile(r"sk_live_[0-9a-zA-Z]{24,}")),
     ("Database URL secret", re.compile(r"(?i)(mysql|postgres|mongodb)://\S+:\S+@")),
 ]
 
-_ENTROPY_THRESHOLD = 4.5   # bits per char — strings above this are suspicious
-_MIN_TOKEN_LEN = 20        # only check tokens this long or longer
+_ENTROPY_THRESHOLD = 4.5  # bits per char — strings above this are suspicious
+_MIN_TOKEN_LEN = 20  # only check tokens this long or longer
 _ADDED_LINE = re.compile(r"^\+(?!\+\+)", re.MULTILINE)
 
 
@@ -43,10 +43,7 @@ def _shannon_entropy(s: str) -> float:
     for c in s:
         freq[c] = freq.get(c, 0) + 1
     length = len(s)
-    return -sum(
-        (count / length) * math.log2(count / length)
-        for count in freq.values()
-    )
+    return -sum((count / length) * math.log2(count / length) for count in freq.values())
 
 
 class NoSecretsInvariant(BaseInvariant):
@@ -85,7 +82,7 @@ class NoSecretsInvariant(BaseInvariant):
                 findings.append(f"{label}: {len(matches)} occurrence(s)")
 
         # ── entropy scan ───────────────────────────────────────────────
-        token_re = re.compile(r"[A-Za-z0-9+/=_-]{%d,}" % _MIN_TOKEN_LEN)
+        token_re = re.compile(r"[A-Za-z0-9+/=_-]{%d,}" % _MIN_TOKEN_LEN)  # noqa: UP031
         high_entropy_count = 0
         for token in token_re.findall(added_blob):
             if _shannon_entropy(token) >= _ENTROPY_THRESHOLD:

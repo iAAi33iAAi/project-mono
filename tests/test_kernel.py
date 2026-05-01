@@ -10,25 +10,40 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from invariants import KERNEL_VERSION, BaseInvariant, load_invariants # noqa: E402
-from invariants.infra_plan_check import InfraPlanCheckInvariant # noqa: E402
-from invariants.no_secrets import NoSecretsInvariant # noqa: E402
-from invariants.tests_and_types import TestsAndTypesInvariant # noqa: E402
-from scripts.ledger_append import append_decision, read_ledger # noqa: E402
+from invariants import KERNEL_VERSION, BaseInvariant, load_invariants  # noqa: E402
+from invariants.infra_plan_check import InfraPlanCheckInvariant  # noqa: E402
+from invariants.no_secrets import NoSecretsInvariant  # noqa: E402
+from invariants.tests_and_types import TestsAndTypesInvariant  # noqa: E402
+from scripts.ledger_append import append_decision, read_ledger  # noqa: E402
 
 
 def _ctx(tmp_path, *, diff="", ci=None, files=None, emergency=False):
-    return {"pr_number": 42, "commit_sha": "abc123", "actor": "tester",
-            "mode": "merge", "emergency": emergency, "diff_text": diff,
-            "changed_files": files or [], "ci_artifacts": ci or {},
-            "repo_root": tmp_path}
+    return {
+        "pr_number": 42,
+        "commit_sha": "abc123",
+        "actor": "tester",
+        "mode": "merge",
+        "emergency": emergency,
+        "diff_text": diff,
+        "changed_files": files or [],
+        "ci_artifacts": ci or {},
+        "repo_root": tmp_path,
+    }
 
 
 def _record(**kw):
-    base = {"decision_id": str(uuid4()), "timestamp": "2026-04-30T00:00:00Z",
-            "actor": "a", "pr_number": 1, "commit_sha": "dead",
-            "mode": "merge", "invariant_results": {}, "decision": "approve",
-            "reason": "ok", "kernel_version": KERNEL_VERSION}
+    base = {
+        "decision_id": str(uuid4()),
+        "timestamp": "2026-04-30T00:00:00Z",
+        "actor": "a",
+        "pr_number": 1,
+        "commit_sha": "dead",
+        "mode": "merge",
+        "invariant_results": {},
+        "decision": "approve",
+        "reason": "ok",
+        "kernel_version": KERNEL_VERSION,
+    }
     base.update(kw)
     return base
 
@@ -67,10 +82,16 @@ class TestInfraPlan:
         assert InfraPlanCheckInvariant().evaluate(_ctx(tmp_path)).passed()
 
     def test_destroy_deny(self, tmp_path):
-        plan = {"resource_changes": [{"address": "aws_rds.prod",
-                "type": "aws_rds_cluster", "change": {"actions": ["delete"]}}]}
-        ctx = _ctx(tmp_path, files=["infra/terraform/main.tf"],
-                   ci={"terraform_plan": plan})
+        plan = {
+            "resource_changes": [
+                {
+                    "address": "aws_rds.prod",
+                    "type": "aws_rds_cluster",
+                    "change": {"actions": ["delete"]},
+                }
+            ]
+        }
+        ctx = _ctx(tmp_path, files=["infra/terraform/main.tf"], ci={"terraform_plan": plan})
         assert InfraPlanCheckInvariant().evaluate(ctx).status == "fail"
 
 
@@ -94,26 +115,62 @@ class TestLedger:
 class TestKernelE2E:
     def test_approve(self, tmp_path):
         from scripts.alga_fold_kernel import run
+
         ci = tmp_path / "ci.json"
         ci.write_text(json.dumps({"pytest": {"exit_code": 0}, "ruff": "pass", "mypy": "pass"}))
         ledger = tmp_path / "ledger.jsonl"
-        rc = run(["--pr", "99", "--commit", "aaa", "--actor", "bob",
-                  "--mode", "merge", "--ci-artifacts", str(ci),
-                  "--repo-root", str(tmp_path), "--ledger", str(ledger),
-                  "--metrics", str(tmp_path / "m.json")])
+        rc = run(
+            [
+                "--pr",
+                "99",
+                "--commit",
+                "aaa",
+                "--actor",
+                "bob",
+                "--mode",
+                "merge",
+                "--ci-artifacts",
+                str(ci),
+                "--repo-root",
+                str(tmp_path),
+                "--ledger",
+                str(ledger),
+                "--metrics",
+                str(tmp_path / "m.json"),
+            ]
+        )
         assert rc == 0
         assert read_ledger(ledger)[0]["decision"] == "approve"
 
     def test_deny_secret(self, tmp_path):
         from scripts.alga_fold_kernel import run
+
         diff = tmp_path / "pr.diff"
         diff.write_text('+SECRET="AKIAIOSFODNN7EXAMPLE"\n')
         ci = tmp_path / "ci.json"
         ci.write_text(json.dumps({"pytest": {"exit_code": 0}, "ruff": "pass", "mypy": "pass"}))
         ledger = tmp_path / "ledger.jsonl"
-        rc = run(["--pr", "100", "--commit", "bbb", "--actor", "eve",
-                  "--mode", "merge", "--diff-file", str(diff),
-                  "--ci-artifacts", str(ci), "--repo-root", str(tmp_path),
-                  "--ledger", str(ledger), "--metrics", str(tmp_path / "m.json")])
+        rc = run(
+            [
+                "--pr",
+                "100",
+                "--commit",
+                "bbb",
+                "--actor",
+                "eve",
+                "--mode",
+                "merge",
+                "--diff-file",
+                str(diff),
+                "--ci-artifacts",
+                str(ci),
+                "--repo-root",
+                str(tmp_path),
+                "--ledger",
+                str(ledger),
+                "--metrics",
+                str(tmp_path / "m.json"),
+            ]
+        )
         assert rc == 1
         assert read_ledger(ledger)[0]["decision"] == "deny"

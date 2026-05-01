@@ -32,9 +32,7 @@ class TestsAndTypesInvariant(BaseInvariant):
                 name=self.name,
                 status="warn",
                 details="no CI artifact JSON provided; cannot verify test results",
-                remediation=[
-                    "re-run kernel with --ci-artifacts pointing to the CI output JSON"
-                ],
+                remediation=["re-run kernel with --ci-artifacts pointing to the CI output JSON"],
             )
 
         failures: list[str] = []
@@ -77,12 +75,9 @@ class TestsAndTypesInvariant(BaseInvariant):
                 rate = float(flakiness)
                 if rate > _FLAKINESS_THRESHOLD:
                     failures.append(
-                        f"flakiness rate {rate:.2%} exceeds "
-                        f"threshold {_FLAKINESS_THRESHOLD:.2%}"
+                        f"flakiness rate {rate:.2%} exceeds threshold {_FLAKINESS_THRESHOLD:.2%}"
                     )
-                    remediation.append(
-                        "stabilise flaky tests (run pytest --count=10 locally)"
-                    )
+                    remediation.append("stabilise flaky tests (run pytest --count=10 locally)")
             except (TypeError, ValueError):
                 pass
 

@@ -30,9 +30,7 @@ class LedgerPresenceInvariant(BaseInvariant):
 
         # Only enforce for critical-path changes
         touches_critical = any(
-            f.startswith(prefix)
-            for f in changed
-            for prefix in _CRITICAL_PREFIXES
+            f.startswith(prefix) for f in changed for prefix in _CRITICAL_PREFIXES
         )
         if not touches_critical:
             return InvariantResult(
@@ -79,10 +77,7 @@ class LedgerPresenceInvariant(BaseInvariant):
                     continue
 
         # Neither found — fail
-        critical_files = [
-            f for f in changed
-            if any(f.startswith(p) for p in _CRITICAL_PREFIXES)
-        ]
+        critical_files = [f for f in changed if any(f.startswith(p) for p in _CRITICAL_PREFIXES)]
         return InvariantResult(
             name=self.name,
             status="fail",

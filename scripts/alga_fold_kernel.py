@@ -7,6 +7,7 @@ Knowledge Ledger.
 
 Exit codes: 0 approved, 1 denied, 2 internal error.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -19,10 +20,10 @@ from uuid import uuid4
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
-import contextlib
+import contextlib  # noqa: E402
 
-from invariants import KERNEL_VERSION, InvariantResult, load_invariants
-from scripts.ledger_append import append_decision
+from invariants import KERNEL_VERSION, InvariantResult, load_invariants  # noqa: E402
+from scripts.ledger_append import append_decision  # noqa: E402
 
 
 def _build_context(args):
@@ -39,10 +40,14 @@ def _build_context(args):
     if args.ci_artifacts and Path(args.ci_artifacts).is_file():
         ci_artifacts = json.loads(Path(args.ci_artifacts).read_text(encoding="utf-8"))
     return {
-        "pr_number": args.pr, "commit_sha": args.commit,
-        "actor": args.actor, "mode": args.mode,
-        "emergency": args.emergency, "diff_text": diff_text,
-        "changed_files": changed_files, "ci_artifacts": ci_artifacts,
+        "pr_number": args.pr,
+        "commit_sha": args.commit,
+        "actor": args.actor,
+        "mode": args.mode,
+        "emergency": args.emergency,
+        "diff_text": diff_text,
+        "changed_files": changed_files,
+        "ci_artifacts": ci_artifacts,
         "repo_root": Path(args.repo_root).resolve(),
     }
 
@@ -51,25 +56,35 @@ def _make_record(ctx, results, decision, reason, remediations, elapsed_ms):
     return {
         "decision_id": str(uuid4()),
         "timestamp": datetime.now(UTC).isoformat(),
-        "actor": ctx["actor"], "pr_number": ctx["pr_number"],
-        "commit_sha": ctx["commit_sha"], "mode": ctx["mode"],
+        "actor": ctx["actor"],
+        "pr_number": ctx["pr_number"],
+        "commit_sha": ctx["commit_sha"],
+        "mode": ctx["mode"],
         "emergency": ctx["emergency"],
-        "invariant_results": {
-            r.name: {"status": r.status, "details": r.details} for r in results
-        },
-        "decision": decision, "reason": reason,
-        "remediation": remediations, "elapsed_ms": elapsed_ms,
-        "kernel_version": KERNEL_VERSION, "signature": None,
+        "invariant_results": {r.name: {"status": r.status, "details": r.details} for r in results},
+        "decision": decision,
+        "reason": reason,
+        "remediation": remediations,
+        "elapsed_ms": elapsed_ms,
+        "kernel_version": KERNEL_VERSION,
+        "signature": None,
     }
 
 
 def _update_metrics(path, record):
     path.parent.mkdir(parents=True, exist_ok=True)
-    metrics = json.loads(path.read_text()) if path.is_file() else {
-        "total_decisions": 0, "approvals": 0, "denials": 0,
-        "emergency_bypasses": 0, "failures_by_invariant": {},
-        "total_elapsed_ms": 0,
-    }
+    metrics = (
+        json.loads(path.read_text())
+        if path.is_file()
+        else {
+            "total_decisions": 0,
+            "approvals": 0,
+            "denials": 0,
+            "emergency_bypasses": 0,
+            "failures_by_invariant": {},
+            "total_elapsed_ms": 0,
+        }
+    )
     metrics["total_decisions"] += 1
     metrics["total_elapsed_ms"] += record["elapsed_ms"]
     if record["decision"] == "approve":
@@ -80,7 +95,9 @@ def _update_metrics(path, record):
         metrics["emergency_bypasses"] += 1
     for name, res in record["invariant_results"].items():
         if res["status"] in ("fail", "error"):
-            metrics["failures_by_invariant"][name] = metrics["failures_by_invariant"].get(name, 0) + 1
+            metrics["failures_by_invariant"][name] = (
+                metrics["failures_by_invariant"].get(name, 0) + 1
+            )
     path.write_text(json.dumps(metrics, indent=2) + "\n")
 
 
@@ -89,13 +106,17 @@ def run(argv=None):
     parser.add_argument("--pr", type=int, required=True)
     parser.add_argument("--commit", required=True)
     parser.add_argument("--actor", required=True)
-    parser.add_argument("--mode", choices=["merge","deploy","apply"], default="merge")
+    parser.add_argument("--mode", choices=["merge", "deploy", "apply"], default="merge")
     parser.add_argument("--diff-file", default=None)
     parser.add_argument("--ci-artifacts", default=None)
     parser.add_argument("--emergency", action="store_true")
     parser.add_argument("--repo-root", default=str(PROJECT_ROOT))
-    parser.add_argument("--ledger", default=str(PROJECT_ROOT/"ops"/"ledger"/"kernel-decisions.jsonl"))
-    parser.add_argument("--metrics", default=str(PROJECT_ROOT/"ops"/"monitoring"/"kernel-metrics.json"))
+    parser.add_argument(
+        "--ledger", default=str(PROJECT_ROOT / "ops" / "ledger" / "kernel-decisions.jsonl")
+    )
+    parser.add_argument(
+        "--metrics", default=str(PROJECT_ROOT / "ops" / "monitoring" / "kernel-metrics.json")
+    )
     args = parser.parse_args(argv)
     try:
         ctx = _build_context(args)
@@ -109,7 +130,14 @@ def run(argv=None):
         try:
             results.append(inv.evaluate(ctx))
         except Exception as exc:
-            results.append(InvariantResult(name=inv.name, status="error", details=f"exception: {exc}", remediation=["investigate invariant crash"]))
+            results.append(
+                InvariantResult(
+                    name=inv.name,
+                    status="error",
+                    details=f"exception: {exc}",
+                    remediation=["investigate invariant crash"],
+                )
+            )
     elapsed_ms = (time.monotonic_ns() - start) // 1_000_000
     failures = [r for r in results if r.status in ("fail", "error")]
     all_remediations = []

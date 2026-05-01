@@ -41,14 +41,12 @@ class GpgSignatureCheckInvariant(BaseInvariant):
 
         if role_map_path.is_file():
             try:
-                role_map: dict[str, Any] = json.loads(
-                    role_map_path.read_text(encoding="utf-8")
-                )
+                role_map: dict[str, Any] = json.loads(role_map_path.read_text(encoding="utf-8"))
                 actor_role = role_map.get("actors", {}).get(actor, {})
                 require_gpg = bool(actor_role.get("require_gpg", False))
 
                 # Also check global setting
-                if role_map.get("global", {}).get("require_gpg_for_deploy"):
+                if role_map.get("global", {}).get("require_gpg_for_deploy"):  # noqa: SIM102
                     if mode in _GPG_ENFORCED_MODES:
                         require_gpg = True
             except (json.JSONDecodeError, OSError):
@@ -59,10 +57,7 @@ class GpgSignatureCheckInvariant(BaseInvariant):
             return InvariantResult(
                 name=self.name,
                 status="pass",
-                details=(
-                    f"GPG signing not required for actor={actor!r} "
-                    f"mode={mode!r}"
-                ),
+                details=(f"GPG signing not required for actor={actor!r} mode={mode!r}"),
             )
 
         if mode not in _GPG_ENFORCED_MODES:
@@ -70,8 +65,7 @@ class GpgSignatureCheckInvariant(BaseInvariant):
                 name=self.name,
                 status="pass",
                 details=(
-                    f"GPG required for deploy/apply but mode is {mode!r}; "
-                    "skipping enforcement"
+                    f"GPG required for deploy/apply but mode is {mode!r}; skipping enforcement"
                 ),
             )
 
@@ -83,8 +77,7 @@ class GpgSignatureCheckInvariant(BaseInvariant):
                 name=self.name,
                 status="fail",
                 details=(
-                    "GPG signature required for this action but no "
-                    "gpg_status found in CI artifacts"
+                    "GPG signature required for this action but no gpg_status found in CI artifacts"
                 ),
                 remediation=[
                     "sign the commit with GPG: git commit -S",

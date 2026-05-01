@@ -38,9 +38,7 @@ class GraphAnomalyCheckInvariant(BaseInvariant):
             )
 
         try:
-            anomalies: list[dict[str, Any]] = json.loads(
-                anomalies_path.read_text(encoding="utf-8")
-            )
+            anomalies: list[dict[str, Any]] = json.loads(anomalies_path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError) as exc:
             return InvariantResult(
                 name=self.name,
@@ -104,13 +102,10 @@ class GraphAnomalyCheckInvariant(BaseInvariant):
         return InvariantResult(
             name=self.name,
             status="fail",
-            details=(
-                "anomaly-flagged files touched without a case: "
-                + "; ".join(detail_parts)
-            ),
+            details=("anomaly-flagged files touched without a case: " + "; ".join(detail_parts)),
             remediation=[
                 "create a broken-to-better case for this PR",
                 "request an additional reviewer for anomaly-flagged files",
-                f"threshold is {_SEVERITY_THRESHOLD}; lower severity anomalies are informational only",
+                f"threshold is {_SEVERITY_THRESHOLD}; lower severity anomalies are informational only",  # noqa: E501
             ],
         )

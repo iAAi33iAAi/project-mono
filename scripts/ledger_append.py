@@ -4,6 +4,7 @@
 Writes use a temp-file-then-rename strategy so a crash never
 corrupts existing entries.
 """
+
 from __future__ import annotations
 
 import contextlib
@@ -15,11 +16,20 @@ from typing import Any
 
 __all__ = ["append_decision"]
 
-_REQUIRED_FIELDS = frozenset({
-    "decision_id", "timestamp", "actor", "pr_number",
-    "commit_sha", "mode", "invariant_results",
-    "decision", "reason", "kernel_version",
-})
+_REQUIRED_FIELDS = frozenset(
+    {
+        "decision_id",
+        "timestamp",
+        "actor",
+        "pr_number",
+        "commit_sha",
+        "mode",
+        "invariant_results",
+        "decision",
+        "reason",
+        "kernel_version",
+    }
+)
 
 
 def _validate(record: dict[str, Any]) -> None:
@@ -35,13 +45,15 @@ def append_decision(record: dict[str, Any], ledger_path: Path) -> None:
     _validate(record)
     ledger_path = ledger_path.resolve()
     ledger_path.parent.mkdir(parents=True, exist_ok=True)
-    new_line = json.dumps(record, separators=(',', ':'), sort_keys=True) + '\n'
-    existing = ledger_path.read_text(encoding='utf-8') if ledger_path.is_file() else ''
+    new_line = json.dumps(record, separators=(",", ":"), sort_keys=True) + "\n"
+    existing = ledger_path.read_text(encoding="utf-8") if ledger_path.is_file() else ""
     fd, tmp_path = tempfile.mkstemp(
-        dir=str(ledger_path.parent), prefix='.ledger-tmp-', suffix='.jsonl',
+        dir=str(ledger_path.parent),
+        prefix=".ledger-tmp-",
+        suffix=".jsonl",
     )
     try:
-        with os.fdopen(fd, 'w', encoding='utf-8') as fh:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
             fh.write(existing)
             fh.write(new_line)
             fh.flush()
@@ -58,7 +70,7 @@ def read_ledger(ledger_path: Path) -> list[dict[str, Any]]:
     if not ledger_path.is_file():
         return []
     records = []
-    for line in ledger_path.read_text(encoding='utf-8').splitlines():
+    for line in ledger_path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if line:
             records.append(json.loads(line))

@@ -50,6 +50,7 @@ pytest tests/ -v
 
 The kernel is the final gate for merges, deploys, and infra applies.
 
+
 ```bash
 python scripts/alga_fold_kernel.py --pr 123 --commit abc123 --actor alice --mode merge
 ```

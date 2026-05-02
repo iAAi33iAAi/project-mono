@@ -1,7 +1,7 @@
 [project]
 name = "project-mono"
 version = "0.1.0"
-description = "Unified monorepo  code, docs, infra, experiments, data."
+description = "Unified monorepo - code, docs, infra, experiments, data."
 requires-python = ">=3.11"
 license = {text = "MIT"}
 
@@ -9,37 +9,23 @@ license = {text = "MIT"}
 target-version = "py311"
 line-length = 140
 select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF"]
-ignore = [
-    "E501",   # line too long  handled by line-length = 140
-        "I001",   # unsorted imports  auto-fixable, not blocking
-            "UP006",  # use list instead of List  style preference
-                "UP007",  # use X | Y instead of Union  style preference
-                    "UP017",  # use datetime.UTC  style preference
-                        "UP035",  # use list instead of typing.List  style preference
-                            "UP042",  # str+Enum inheritance  style preference
-                                "UP045",  # use X | None not Optional[X]  style preference
-                                    "N818",   # exception naming convention  style preference
-                                        "F401",   # unused imports  fix incrementally
-                                            "B008",   # function call in default arg  common pattern
-                                                "RUF012", # mutable class variable  common pattern
-                                                ]
+ignore = ["E501", "I001", "UP006", "UP007", "UP017", "UP035", "UP042", "UP045", "N818", "F401", "B008", "RUF012"]
 
-                                                [tool.ruff.lint.isort]
-                                                known-first-party = ["src"]
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
 
-                                                [tool.ruff.lint.per-file-ignores]
-                                                "__init__.py" = ["F401"]
-                                                "tests/**" = ["B", "SIM"]
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**" = ["B", "SIM"]
 
-                                                [tool.pytest.ini_options]
-                                                testpaths = ["tests"]
-                                                asyncio_mode = "auto"
-                                                addopts = "-v --tb=short"
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-v --tb=short"
 
-                                                [tool.mypy]
-                                                python_version = "3.11"
-                                                strict = false
-                                                warn_return_any = true
-                                                warn_unused_configs = true
-                                                ignore_missing_imports = true
-                                                
+[tool.mypy]
+python_version = "3.11"
+strict = false
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true

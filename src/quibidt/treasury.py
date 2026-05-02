@@ -1,4 +1,5 @@
 """1440 Treasury with collateralization guard."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -46,10 +47,7 @@ class Treasury:
         future = self.outstanding + amount
         assets = self.gold + self.digital
         if future > 0 and assets / future < COLLATERAL_MIN:
-            raise TreasuryHalt(
-                f"Collateral ratio {assets / future:.4f} "
-                f"below minimum {COLLATERAL_MIN}"
-            )
+            raise TreasuryHalt(f"Collateral ratio {assets / future:.4f} below minimum {COLLATERAL_MIN}")
         self.outstanding = future
 
     def snapshot(self) -> TreasurySnapshot:

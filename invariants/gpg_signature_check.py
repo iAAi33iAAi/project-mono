@@ -64,9 +64,7 @@ class GpgSignatureCheckInvariant(BaseInvariant):
             return InvariantResult(
                 name=self.name,
                 status="pass",
-                details=(
-                    f"GPG required for deploy/apply but mode is {mode!r}; skipping enforcement"
-                ),
+                details=(f"GPG required for deploy/apply but mode is {mode!r}; skipping enforcement"),
             )
 
         # -- check CI artifacts for GPG status --
@@ -76,9 +74,7 @@ class GpgSignatureCheckInvariant(BaseInvariant):
             return InvariantResult(
                 name=self.name,
                 status="fail",
-                details=(
-                    "GPG signature required for this action but no gpg_status found in CI artifacts"
-                ),
+                details=("GPG signature required for this action but no gpg_status found in CI artifacts"),
                 remediation=[
                     "sign the commit with GPG: git commit -S",
                     "ensure CI exports gpg_status in the artifacts JSON",

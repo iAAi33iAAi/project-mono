@@ -88,10 +88,7 @@ class NoSecretsInvariant(BaseInvariant):
             if _shannon_entropy(token) >= _ENTROPY_THRESHOLD:
                 high_entropy_count += 1
         if high_entropy_count:
-            findings.append(
-                f"high-entropy strings: {high_entropy_count} token(s) "
-                f"above {_ENTROPY_THRESHOLD} bits/char"
-            )
+            findings.append(f"high-entropy strings: {high_entropy_count} token(s) above {_ENTROPY_THRESHOLD} bits/char")
 
         if findings:
             return InvariantResult(

@@ -1,4 +1,5 @@
 """Apollo Executive -- interrupt priority and thermal guard."""
+
 from __future__ import annotations
 
 import enum

@@ -74,9 +74,7 @@ class TestsAndTypesInvariant(BaseInvariant):
             try:
                 rate = float(flakiness)
                 if rate > _FLAKINESS_THRESHOLD:
-                    failures.append(
-                        f"flakiness rate {rate:.2%} exceeds threshold {_FLAKINESS_THRESHOLD:.2%}"
-                    )
+                    failures.append(f"flakiness rate {rate:.2%} exceeds threshold {_FLAKINESS_THRESHOLD:.2%}")
                     remediation.append("stabilise flaky tests (run pytest --count=10 locally)")
             except (TypeError, ValueError):
                 pass

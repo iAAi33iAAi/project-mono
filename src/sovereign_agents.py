@@ -31,7 +31,9 @@ def create_codex_guardian():
         role="Codex Guardian",
         goal="Ensure every action complies with the three immutable Codex rules.",
         backstory=f"{CODEX_PREAMBLE} You are the constitutional court of the sovereign architecture.",
-        llm=OLLAMA_MODEL, verbose=True, allow_delegation=False,
+        llm=OLLAMA_MODEL,
+        verbose=True,
+        allow_delegation=False,
     )
 
 
@@ -40,7 +42,9 @@ def create_research_worker():
         role="Research Worker",
         goal="Gather and synthesize information with full source attribution and lineage.",
         backstory=f"{CODEX_PREAMBLE} You research topics and present actionable intelligence.",
-        llm=OLLAMA_REASON, verbose=True, allow_delegation=True,
+        llm=OLLAMA_REASON,
+        verbose=True,
+        allow_delegation=True,
     )
 
 
@@ -49,7 +53,9 @@ def create_builder():
         role="Builder",
         goal="Write production-quality code and docs for project-mono.",
         backstory=f"{CODEX_PREAMBLE} You build sovereign infrastructure. Every artifact carries provenance.",
-        llm=OLLAMA_CODE, verbose=True, allow_delegation=True,
+        llm=OLLAMA_CODE,
+        verbose=True,
+        allow_delegation=True,
     )
 
 
@@ -58,7 +64,9 @@ def create_colony_manager():
         role="Colony Manager",
         goal="Monitor Colony health, spawn replacements, provision workers. MAPE loop.",
         backstory=f"{CODEX_PREAMBLE} You manage the Grapple Colony execution layer.",
-        llm=OLLAMA_MODEL, verbose=True, allow_delegation=True,
+        llm=OLLAMA_MODEL,
+        verbose=True,
+        allow_delegation=True,
     )
 
 
@@ -69,15 +77,28 @@ def deploy_colony(tasks=None, process="sequential"):
     manager = create_colony_manager()
     if tasks is None:
         tasks = [
-            Task(description="Index the Biomanifesto and all repo docs into ChromaDB with lineage.", expected_output="Structured indexing report.", agent=researcher),
-            Task(description="Propose up to 5 new Codex rules from the Biomanifesto. PROPOSALS ONLY.", expected_output="List of proposed rules pending Architect approval.", agent=guardian),
-            Task(description="Write active_digitwin.py implementing Mode 2 delegation with full lineage.", expected_output="Complete Python source for active_digitwin.py.", agent=builder),
+            Task(
+                description="Index the Biomanifesto and all repo docs into ChromaDB with lineage.",
+                expected_output="Structured indexing report.",
+                agent=researcher,
+            ),
+            Task(
+                description="Propose up to 5 new Codex rules from the Biomanifesto. PROPOSALS ONLY.",
+                expected_output="List of proposed rules pending Architect approval.",
+                agent=guardian,
+            ),
+            Task(
+                description="Write active_digitwin.py implementing Mode 2 delegation with full lineage.",
+                expected_output="Complete Python source for active_digitwin.py.",
+                agent=builder,
+            ),
         ]
     colony = Crew(
         agents=[guardian, researcher, builder, manager],
         tasks=tasks,
         process=Process.sequential if process == "sequential" else Process.hierarchical,
-        verbose=True, memory=True,
+        verbose=True,
+        memory=True,
     )
     print("[COLONY] Sovereign co-workers deployed.")
     print("[CODEX] Three immutable rules loaded.")

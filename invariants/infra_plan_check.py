@@ -60,10 +60,7 @@ class InfraPlanCheckInvariant(BaseInvariant):
             return InvariantResult(
                 name=self.name,
                 status="warn",
-                details=(
-                    "PR touches infra/ but no terraform_plan in CI artifacts; "
-                    "cannot verify safety of infrastructure changes"
-                ),
+                details=("PR touches infra/ but no terraform_plan in CI artifacts; cannot verify safety of infrastructure changes"),
                 remediation=[
                     "add terraform plan JSON output to CI artifacts",
                     "re-run kernel with --ci-artifacts including terraform_plan",
@@ -120,18 +117,13 @@ class InfraPlanCheckInvariant(BaseInvariant):
                 remediation=remediation,
             )
 
-        add_count = sum(
-            1 for rc in resource_changes if "create" in rc.get("change", {}).get("actions", [])
-        )
-        update_count = sum(
-            1 for rc in resource_changes if "update" in rc.get("change", {}).get("actions", [])
-        )
+        add_count = sum(1 for rc in resource_changes if "create" in rc.get("change", {}).get("actions", []))
+        update_count = sum(1 for rc in resource_changes if "update" in rc.get("change", {}).get("actions", []))
 
         return InvariantResult(
             name=self.name,
             status="pass",
             details=(
-                f"plan: +{add_count} ~{update_count} -{destroy_count} resources; "
-                "no protected deletions or security-sensitive changes"
+                f"plan: +{add_count} ~{update_count} -{destroy_count} resources; no protected deletions or security-sensitive changes"
             ),
         )

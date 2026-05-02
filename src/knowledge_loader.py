@@ -22,19 +22,24 @@ CHUNK_OVERLAP = 200
 def chunk_text(text, source, doc_type):
     chunks, words, i, idx = [], text.split(), 0, 0
     while i < len(words):
-        ct = " ".join(words[i:i + CHUNK_SIZE])
+        ct = " ".join(words[i : i + CHUNK_SIZE])
         ch = hashlib.sha256(ct.encode()).hexdigest()[:16]
-        chunks.append({
-            "id": f"{source}__chunk_{idx:04d}__{ch}",
-            "text": ct,
-            "metadata": {
-                "source": source, "doc_type": doc_type,
-                "chunk_index": idx, "chunk_hash": ch,
-                "ingested_at": datetime.now(timezone.utc).isoformat(),
-                "node_id": "NODE_001", "human_id": "human_001",
-                "lineage": f"ingested_by=knowledge_loader|source={source}|chunk={idx}",
-            },
-        })
+        chunks.append(
+            {
+                "id": f"{source}__chunk_{idx:04d}__{ch}",
+                "text": ct,
+                "metadata": {
+                    "source": source,
+                    "doc_type": doc_type,
+                    "chunk_index": idx,
+                    "chunk_hash": ch,
+                    "ingested_at": datetime.now(timezone.utc).isoformat(),
+                    "node_id": "NODE_001",
+                    "human_id": "human_001",
+                    "lineage": f"ingested_by=knowledge_loader|source={source}|chunk={idx}",
+                },
+            }
+        )
         i += CHUNK_SIZE - CHUNK_OVERLAP
         idx += 1
     return chunks
@@ -43,7 +48,8 @@ def chunk_text(text, source, doc_type):
 class SovereignKnowledgeStore:
     def __init__(self, persist_dir=CHROMA_DIR):
         self.client = chromadb.PersistentClient(
-            path=persist_dir, settings=Settings(anonymized_telemetry=False),
+            path=persist_dir,
+            settings=Settings(anonymized_telemetry=False),
         )
         self.collection = self.client.get_or_create_collection(
             name=COLLECTION_NAME,
@@ -74,9 +80,16 @@ class SovereignKnowledgeStore:
             self.collection.upsert(
                 ids=[f"codex__rule__{name}"],
                 documents=[text],
-                metadatas=[{"source": "CORE_CODEX", "doc_type": "codex_rule",
-                            "rule_name": name, "immutable": "true",
-                            "node_id": "NODE_001", "human_id": "human_001"}],
+                metadatas=[
+                    {
+                        "source": "CORE_CODEX",
+                        "doc_type": "codex_rule",
+                        "rule_name": name,
+                        "immutable": "true",
+                        "node_id": "NODE_001",
+                        "human_id": "human_001",
+                    }
+                ],
             )
         print("[KNOWLEDGE] Ingested 3 immutable Codex rules.")
         return 3
@@ -91,12 +104,19 @@ class SovereignKnowledgeStore:
 
     def query(self, question, n_results=5):
         results = self.collection.query(query_texts=[question], n_results=n_results)
-        return [{"id": results["ids"][0][i], "text": results["documents"][0][i],
-                 "metadata": results["metadatas"][0][i]} for i in range(len(results["ids"][0]))]
+        return [
+            {"id": results["ids"][0][i], "text": results["documents"][0][i], "metadata": results["metadatas"][0][i]}
+            for i in range(len(results["ids"][0]))
+        ]
 
     def status(self):
-        return {"collection": COLLECTION_NAME, "total_records": self.collection.count(),
-                "persist_dir": CHROMA_DIR, "node_id": "NODE_001", "sovereign": True}
+        return {
+            "collection": COLLECTION_NAME,
+            "total_records": self.collection.count(),
+            "persist_dir": CHROMA_DIR,
+            "node_id": "NODE_001",
+            "sovereign": True,
+        }
 
 
 if __name__ == "__main__":

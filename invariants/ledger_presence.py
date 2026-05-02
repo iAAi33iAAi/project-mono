@@ -29,9 +29,7 @@ class LedgerPresenceInvariant(BaseInvariant):
         repo_root: Path = ctx.get("repo_root", Path("."))
 
         # Only enforce for critical-path changes
-        touches_critical = any(
-            f.startswith(prefix) for f in changed for prefix in _CRITICAL_PREFIXES
-        )
+        touches_critical = any(f.startswith(prefix) for f in changed for prefix in _CRITICAL_PREFIXES)
         if not touches_critical:
             return InvariantResult(
                 name=self.name,
@@ -81,10 +79,7 @@ class LedgerPresenceInvariant(BaseInvariant):
         return InvariantResult(
             name=self.name,
             status="fail",
-            details=(
-                f"PR #{pr_number} touches critical files "
-                f"({', '.join(critical_files[:5])}) but has no ledger entry or case"
-            ),
+            details=(f"PR #{pr_number} touches critical files ({', '.join(critical_files[:5])}) but has no ledger entry or case"),
             remediation=[
                 f"create docs/broken-to-better/cases/<id>/metadata.json with pr_number={pr_number}",
                 "or ensure a prior kernel decision record references this PR",

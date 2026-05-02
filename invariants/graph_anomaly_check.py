@@ -66,10 +66,7 @@ class GraphAnomalyCheckInvariant(BaseInvariant):
             return InvariantResult(
                 name=self.name,
                 status="pass",
-                details=(
-                    f"checked {len(changed)} changed file(s) against "
-                    f"{len(severity_map)} anomaly entries; none above threshold"
-                ),
+                details=(f"checked {len(changed)} changed file(s) against {len(severity_map)} anomaly entries; none above threshold"),
             )
 
         # Check whether a case already exists for this PR
@@ -91,11 +88,7 @@ class GraphAnomalyCheckInvariant(BaseInvariant):
             return InvariantResult(
                 name=self.name,
                 status="pass",
-                details=(
-                    f"anomaly flagged file(s) "
-                    f"({', '.join(f for f, _ in flagged)}) but a case exists "
-                    f"for PR #{pr_number}"
-                ),
+                details=(f"anomaly flagged file(s) ({', '.join(f for f, _ in flagged)}) but a case exists for PR #{pr_number}"),
             )
 
         detail_parts = [f"{f} (severity {s:.2f})" for f, s in flagged]

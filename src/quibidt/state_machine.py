@@ -1,4 +1,5 @@
 """QUIBIDT State Machine -- Flow-state governance engine."""
+
 from __future__ import annotations
 
 import enum

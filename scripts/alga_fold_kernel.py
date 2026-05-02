@@ -95,9 +95,7 @@ def _update_metrics(path, record):
         metrics["emergency_bypasses"] += 1
     for name, res in record["invariant_results"].items():
         if res["status"] in ("fail", "error"):
-            metrics["failures_by_invariant"][name] = (
-                metrics["failures_by_invariant"].get(name, 0) + 1
-            )
+            metrics["failures_by_invariant"][name] = metrics["failures_by_invariant"].get(name, 0) + 1
     path.write_text(json.dumps(metrics, indent=2) + "\n")
 
 
@@ -111,12 +109,8 @@ def run(argv=None):
     parser.add_argument("--ci-artifacts", default=None)
     parser.add_argument("--emergency", action="store_true")
     parser.add_argument("--repo-root", default=str(PROJECT_ROOT))
-    parser.add_argument(
-        "--ledger", default=str(PROJECT_ROOT / "ops" / "ledger" / "kernel-decisions.jsonl")
-    )
-    parser.add_argument(
-        "--metrics", default=str(PROJECT_ROOT / "ops" / "monitoring" / "kernel-metrics.json")
-    )
+    parser.add_argument("--ledger", default=str(PROJECT_ROOT / "ops" / "ledger" / "kernel-decisions.jsonl"))
+    parser.add_argument("--metrics", default=str(PROJECT_ROOT / "ops" / "monitoring" / "kernel-metrics.json"))
     args = parser.parse_args(argv)
     try:
         ctx = _build_context(args)

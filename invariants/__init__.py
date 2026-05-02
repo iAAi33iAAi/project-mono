@@ -49,11 +49,7 @@ def load_invariants() -> list[BaseInvariant]:
         mod = importlib.import_module(info.name)
         for attr_name in dir(mod):
             obj = getattr(mod, attr_name)
-            if (
-                isinstance(obj, type)
-                and issubclass(obj, BaseInvariant)
-                and obj is not BaseInvariant
-            ):
+            if isinstance(obj, type) and issubclass(obj, BaseInvariant) and obj is not BaseInvariant:
                 instances.append(obj())
     instances.sort(key=lambda inv: inv.name)
     return instances

@@ -1,15 +1,17 @@
 [project]
 name = "project-mono"
 version = "0.1.0"
-description = "Unified monorepo - code, docs, infra, experiments, data."
+description = "Unified monorepo"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 
 [tool.ruff]
 target-version = "py311"
 line-length = 140
+
+[tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "SIM", "RUF"]
-ignore = ["E501", "I001", "UP006", "UP007", "UP017", "UP035", "UP042", "UP045", "N818", "F401", "B008", "RUF012"]
+ignore = ["E501", "I001", "UP006", "UP007", "UP017", "UP035", "UP042", "UP045", "N818", "F401", "B008", "RUF012", "RUF100"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]

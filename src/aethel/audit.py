@@ -53,7 +53,7 @@ _DRIFT_PATTERNS = [
     "bypass_gateway",
     "skip_psi_check",
     "disable_stewardship",
-    "ARCHITECT_CONSTANT_DIVISOR = 0",
+    "ARCHITECT_CONSTANT_DIVISOR = 0\n",
 ]
 
 

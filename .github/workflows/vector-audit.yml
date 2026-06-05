@@ -1,0 +1,137 @@
+# Aethel Grid -- Lattice Audit CI Job# Aethel Grid -- Lattice Audit CI Job
+# Laminar Lattice Prime 3.6.9
+# Runs python -m aethel.audit --full on every push.
+# Must return LATTICE_CLEAN (exit 0) before merge.
+
+name: Aethel Lattice Audit
+
+on:
+  push:
+      branches: [main]
+        pull_request:
+            branches: [main]
+
+            jobs:
+              vector-audit:
+                  name: Audit LATTICE_CLEAN
+                      runs-on: ubuntu-latest
+
+                          steps:
+                                - uses: actions/checkout@v4
+
+                                      - name: Set up Python 3.11
+                                              uses: actions/setup-python@v5
+                                                      with:
+                                                                python-version: "3.11"
+
+                                                                      - name: Install aethel
+                                                                              run: |
+                                                                                        pip install --quiet --upgrade pip
+                                                                                                  export PYTHONPATH="$GITHUB_WORKSPACE/src"
+                                                                                                            echo "PYTHONPATH=$GITHUB_WORKSPACE/src" >> $GITHUB_ENV
+                                                                                                            
+                                                                                                                  - name: Run Aethel Grid Sentinel
+                                                                                                                          run: |
+                                                                                                                                    python3 -m aethel.audit --full 2>&1 | tee audit_output.txt
+                                                                                                                                    
+                                                                                                                                          - name: Verify LATTICE_CLEAN
+                                                                                                                                                  run: |
+                                                                                                                                                            if grep -q "LATTICE_CLEAN" audit_output.txt; then
+                                                                                                                                                                        echo "LATTICE_CLEAN -- audit passed"
+                                                                                                                                                                                  else
+                                                                                                                                                                                              echo "LATTICE_DIRTY -- audit failed"
+                                                                                                                                                                                                          exit 1
+                                                                                                                                                                                                                    fi
+                                                                                                                                                                                                                    
+                                                                                                                                                                                                                          - name: Covenant fingerprint
+                                                                                                                                                                                                                                  if: always()
+                                                                                                                                                                                                                                          run: |
+                                                                                                                                                                                                                                                    echo "Protocol: LAMINAR LATTICE PRIME 3.6.9"
+                                                                                                                                                                                                                                                              echo "Node: Node 001 -- Bethel Acres, Oklahoma"
+                                                                                                                                                                                                                                                                        echo "Covenant: 1pct Architect / 84pct Community / 15pct Crew"
+                                                                                                                                                                                                                                                                                  echo "Ca: 0.01 -- Final, immutable"
+                                                                                                                                                                                                                                                                                            echo "Fingerprint: bb4f780730a8ccb520e213bb62cac92452a41399b1197abb95046cd067bc00cc"
+                                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                                                  - name: Upload audit report
+                                                                                                                                                                                                                                                                                                          if: always()
+                                                                                                                                                                                                                                                                                                                  uses: actions/upload-artifact@v4
+                                                                                                                                                                                                                                                                                                                          with:
+                                                                                                                                                                                                                                                                                                                                    name: lattice-audit-report
+                                                                                                                                                                                                                                                                                                                                              path: audit_output.txt
+                                                                                                                                                                                                                                                                                                                                                        retention-days: 30
+# Laminar Lattice Prime 3.6.9
+# Runs python -m aethel.audit --full on every push to main.
+# Must return LATTICE_CLEAN (exit 0) before merge is permitted.
+# SPEC.md Section 7 -- Change Control Gate.
+
+name: Aethel Lattice Audit
+
+on:
+  push:
+      branches: [main]
+        pull_request:
+            branches: [main]
+
+            jobs:
+              vector-audit:
+                  name: "Audit: LATTICE_CLEAN verification"
+                      runs-on: ubuntu-latest
+
+                          steps:
+                                - name: Checkout project-mono
+                                        uses: actions/checkout@v4
+
+                                              - name: Set up Python 3.11
+                                                      uses: actions/setup-python@v5
+                                                              with:
+                                                                        python-version: "3.11"
+
+                                                                              - name: Install aethel package
+                                                                                      run: |
+                                                                                                pip install --quiet --upgrade pip
+                                                                                                          pip install --quiet -e ".[dev]" 2>/dev/null || true
+                                                                                                                    export PYTHONPATH="$GITHUB_WORKSPACE/src:$PYTHONPATH"
+                                                                                                                              echo "PYTHONPATH=$GITHUB_WORKSPACE/src" >> $GITHUB_ENV
+                                                                                                                              
+                                                                                                                                    - name: Run Aethel Grid Sentinel
+                                                                                                                                            id: audit
+                                                                                                                                                    run: |
+                                                                                                                                                              python3 -m aethel.audit --full 2>&1 | tee audit_output.txt
+                                                                                                                                                                        echo "exit_code=${PIPESTATUS[0]}" >> $GITHUB_OUTPUT
+                                                                                                                                                                        
+                                                                                                                                                                              - name: Verify LATTICE_CLEAN
+                                                                                                                                                                                      run: |
+                                                                                                                                                                                                OUTPUT=$(cat audit_output.txt)
+                                                                                                                                                                                                          echo "$OUTPUT"
+                                                                                                                                                                                                                    if echo "$OUTPUT" | grep -q "LATTICE_CLEAN"; then
+                                                                                                                                                                                                                                echo "LATTICE_CLEAN -- audit passed"
+                                                                                                                                                                                                                                          else
+                                                                                                                                                                                                                                                      echo "LATTICE_DIRTY -- audit failed"
+                                                                                                                                                                                                                                                                  echo "Run: python -m aethel.audit --full --verbose for details"
+                                                                                                                                                                                                                                                                              exit 1
+                                                                                                                                                                                                                                                                                        fi
+                                                                                                                                                                                                                                                                                        
+                                                                                                                                                                                                                                                                                              - name: Report covenant fingerprint
+                                                                                                                                                                                                                                                                                                      if: always()
+                                                                                                                                                                                                                                                                                                              run: |
+                                                                                                                                                                                                                                                                                                                        python3 - >>'PYEOF'
+                                                                                                                                                                                                                                                                                                                                  import sys
+                                                                                                                                                                                                                                                                                                                                            sys.path.insert(0, 'src')
+                                                                                                                                                                                                                                                                                                                                                      from aethel import __version__, __lattice__
+                                                                                                                                                                                                                                                                                                                                                                print(f"Package:     aethel v{__version__}")
+                                                                                                                                                                                                                                                                                                                                                                          print(f"Lattice:     {__lattice__}")
+                                                                                                                                                                                                                                                                                                                                                                                    print(f"Protocol:    LAMINAR LATTICE PRIME 3.6.9")
+                                                                                                                                                                                                                                                                                                                                                                                              print(f"Node:        Node 001 -- Bethel Acres, Oklahoma")
+                                                                                                                                                                                                                                                                                                                                                                                                        print(f"Covenant:    1pct Architect / 84pct Community / 15pct Crew")
+                                                                                                                                                                                                                                                                                                                                                                                                                  print(f"Fingerprint: bb4f780730a8ccb520e213bb62cac92452a41399b1197abb95046cd067bc00cc")
+                                                                                                                                                                                                                                                                                                                                                                                                                            print(f"Ca:          Decimal('0.01') -- Final, immutable")
+                                                                                                                                                                                                                                                                                                                                                                                                                                      print(f"Mission:     To protect people who pool their lives together.")
+                                                                                                                                                                                                                                                                                                                                                                                                                                                PYEOF
+                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                                                                                                                                                                                                                      - name: Upload audit report
+                                                                                                                                                                                                                                                                                                                                                                                                                                                              if: always()
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                      uses: actions/upload-artifact@v4
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                              with:
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        name: lattice-audit-report
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  path: audit_output.txt
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            retention-days: 30

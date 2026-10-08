@@ -178,3 +178,5 @@ class TestKernelE2E:
         )
         assert rc == 1
         assert read_ledger(ledger)[0]["decision"] == "deny"
+        metrics = json.loads((tmp_path / "metrics.json").read_text())
+        assert metrics["emergency_bypasses"] == 0

@@ -179,6 +179,40 @@ class TestKernelE2E:
         assert rc == 1
         assert read_ledger(ledger)[0]["decision"] == "deny"
 
+def test_denied_emergency_request_is_not_counted_as_bypass(tmp_path):
+    from scripts import alga_fold_kernel
+
+    class FailingInvariant:
+        name = "redteam_failure"
+
+        def evaluate(self, ctx):
+            from invariants import InvariantResult
+            return InvariantResult(
+                name=self.name,
+                status="fail",
+                details="forced failure",
+                remediation=["do not approve"],
+            )
+
+    ci = tmp_path / "ci.json"
+    ci.write_text(json.dumps({"pytest": {"exit_code": 0}, "ruff": "pass", "mypy": "pass"}))
+    ledger = tmp_path / "ledger.jsonl"
+    metrics = tmp_path / "metrics.json"
+    original = alga_fold_kernel.load_invariants
+    alga_fold_kernel.load_invariants = lambda: [FailingInvariant()]
+    try:
+        rc = alga_fold_kernel.run([
+            "--pr", "9010", "--commit", "redteam", "--actor", "attacker",
+            "--mode", "deploy", "--emergency", "--ci-artifacts", str(ci),
+            "--repo-root", str(tmp_path), "--ledger", str(ledger), "--metrics", str(metrics),
+        ])
+    finally:
+        alga_fold_kernel.load_invariants = original
+    assert rc == 1
+    data = json.loads(metrics.read_text())
+    assert data["emergency_bypasses"] == 0
+
+
 def test_gpg_policy_malformed_fails_closed(tmp_path):
     from invariants.gpg_signature_check import GpgSignatureCheckInvariant
 

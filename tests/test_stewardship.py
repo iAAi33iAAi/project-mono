@@ -185,7 +185,7 @@ class TestAethelGrid:
         session = grid.open_session("")
         scores = [DomainScore(domain, 0.1) for domain in Domain]
         with pytest.raises(RuntimeError, match="substrate"):
-            grid.run_plugin(manifest_valid, session, scores, lambda: None
+            grid.run_plugin(manifest_valid, session, scores, lambda: None)
 
     def test_ledger_audit_report(self, metrics_nominal, manifest_valid):
         grid = AethelGrid()

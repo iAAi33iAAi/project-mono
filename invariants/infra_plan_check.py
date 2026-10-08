@@ -59,11 +59,11 @@ class InfraPlanCheckInvariant(BaseInvariant):
         if not plan and touches_infra:
             return InvariantResult(
                 name=self.name,
-                status="warn",
-                details=("PR touches infra/ but no terraform_plan in CI artifacts; cannot verify safety of infrastructure changes"),
+                status="fail",
+                details="PR touches infra/ but no terraform_plan was supplied; infrastructure safety is unverifiable",
                 remediation=[
                     "add terraform plan JSON output to CI artifacts",
-                    "re-run kernel with --ci-artifacts including terraform_plan",
+                    "re-run the kernel with --ci-artifacts including terraform_plan",
                 ],
             )
 

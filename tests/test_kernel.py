@@ -178,3 +178,21 @@ class TestKernelE2E:
         )
         assert rc == 1
         assert read_ledger(ledger)[0]["decision"] == "deny"
+
+def test_gpg_policy_malformed_fails_closed(tmp_path):
+    from invariants.gpg_signature_check import GpgSignatureCheckInvariant
+
+    role_map = tmp_path / "docs" / "codex"
+    role_map.mkdir(parents=True)
+    (role_map / "role-mapping.json").write_text("{not-json", encoding="utf-8")
+
+    result = GpgSignatureCheckInvariant().evaluate(
+        {
+            "mode": "deploy",
+            "actor": "attacker",
+            "repo_root": tmp_path,
+            "ci_artifacts": {},
+        }
+    )
+
+    assert result.status in {"fail", "error"}

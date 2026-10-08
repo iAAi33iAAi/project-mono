@@ -154,14 +154,14 @@ def _check_ca_constant(root: Path) -> List[AuditFinding]:
         return findings
 
     content = target.read_text(encoding="utf-8", errors="ignore")
-    if "ARCHITECT_CONSTANT_DIVISOR = 0.01" not in content:
+    if "C_a_DIVISOR = 0.01" not in content and "ARCHITECT_CONSTANT_DIVISOR = 0.01" not in content:
         findings.append(
             AuditFinding(
                 severity="CRITICAL",
                 category="CONFIG",
                 path=str(target),
                 detail=(
-                    "Architect's Constant (ARCHITECT_CONSTANT_DIVISOR = 0.01) not found "
+                    "Architect's Constant divisor (C_a_DIVISOR = 0.01) not found "
                     "in stewardship.py."
                 ),
             )

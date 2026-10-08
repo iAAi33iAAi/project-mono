@@ -85,11 +85,12 @@ def compute_psi(
         value = disruption * omega
         sigma += value
         domain = getattr(score, "domain", None)
-        label = (
-            domain.name
-            if hasattr(domain, "name")
-            else f"D{getattr(domain, 'value', '?')}"
-        )
+        if domain is None:
+            label = "D?"
+        elif hasattr(domain, "name"):
+            label = str(domain.name)
+        else:
+            label = f"D{getattr(domain, 'value', '?')}"
         contributions[label] = value
 
     psi = sigma / denominator

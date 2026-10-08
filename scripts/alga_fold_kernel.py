@@ -137,12 +137,16 @@ def run(argv=None):
     all_remediations = []
     for r in failures:
         all_remediations.extend(r.remediation)
-    if ctx["emergency"] and failures:
-        decision, reason = "approve", "EMERGENCY BYPASS — mandatory retrospective within 48 h."
-        all_remediations.insert(0, "file retrospective within 48 hours")
-    elif failures:
+    if failures:
         decision = "deny"
-        reason = f"{len(failures)} invariant(s) failed: " + ", ".join(r.name for r in failures)
+        if ctx["emergency"]:
+            reason = (
+                f"{len(failures)} invariant(s) failed; emergency flag cannot bypass "
+                "the fail-closed policy"
+            )
+            all_remediations.insert(0, "obtain separately authenticated emergency authorization")
+        else:
+            reason = f"{len(failures)} invariant(s) failed: " + ", ".join(r.name for r in failures)
     else:
         decision, reason = "approve", "all invariants passed"
     record = _make_record(ctx, results, decision, reason, all_remediations, elapsed_ms)

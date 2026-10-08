@@ -33,8 +33,9 @@ class GraphAnomalyCheckInvariant(BaseInvariant):
         if not anomalies_path.is_file():
             return InvariantResult(
                 name=self.name,
-                status="pass",
-                details="no anomaly data found at ops/embeddings/anomalies.json; skipping",
+                status="fail",
+                details="anomaly data is missing; graph anomaly analysis cannot be verified",
+                remediation=["regenerate ops/embeddings/anomalies.json before allowing the gate to pass"],
             )
 
         try:

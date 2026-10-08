@@ -39,18 +39,37 @@ class GpgSignatureCheckInvariant(BaseInvariant):
         role_map_path = repo_root / "docs" / "codex" / "role-mapping.json"
         require_gpg = False
 
-        if role_map_path.is_file():
+        if not role_map_path.is_file():
+            if mode in _GPG_ENFORCED_MODES:
+                return InvariantResult(
+                    name=self.name,
+                    status="fail",
+                    details=f"GPG policy file is missing: {role_map_path}",
+                    remediation=["restore docs/codex/role-mapping.json before deploy/apply"],
+                )
+        else:
             try:
-                role_map: dict[str, Any] = json.loads(role_map_path.read_text(encoding="utf-8"))
-                actor_role = role_map.get("actors", {}).get(actor, {})
+                role_map_raw = json.loads(role_map_path.read_text(encoding="utf-8"))
+                if not isinstance(role_map_raw, dict):
+                    raise ValueError("role-mapping root must be an object")
+                actors = role_map_raw.get("actors", {})
+                global_policy = role_map_raw.get("global", {})
+                if not isinstance(actors, dict) or not isinstance(global_policy, dict):
+                    raise ValueError("role-mapping actors/global sections must be objects")
+                actor_role = actors.get(actor, {})
+                if not isinstance(actor_role, dict):
+                    raise ValueError("actor mapping must be an object")
                 require_gpg = bool(actor_role.get("require_gpg", False))
-
-                # Also check global setting
-                if role_map.get("global", {}).get("require_gpg_for_deploy"):  # noqa: SIM102
-                    if mode in _GPG_ENFORCED_MODES:
-                        require_gpg = True
-            except (json.JSONDecodeError, OSError):
-                pass  # treat as "not required" if file is malformed
+                if global_policy.get("require_gpg_for_deploy") and mode in _GPG_ENFORCED_MODES:
+                    require_gpg = True
+            except (json.JSONDecodeError, OSError, ValueError) as exc:
+                if mode in _GPG_ENFORCED_MODES:
+                    return InvariantResult(
+                        name=self.name,
+                        status="error",
+                        details=f"GPG policy could not be established: {exc}",
+                        remediation=["repair docs/codex/role-mapping.json before deploy/apply"],
+                    )
 
         # -- skip if not enforced --
         if not require_gpg:

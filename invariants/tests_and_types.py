@@ -26,13 +26,13 @@ class TestsAndTypesInvariant(BaseInvariant):
     def evaluate(self, ctx: dict[str, Any]) -> InvariantResult:
         ci: dict[str, Any] = ctx.get("ci_artifacts", {})
 
-        # If no CI artifacts provided, we cannot verify — warn but don't block
+        # Missing CI evidence is unsafe for a gate whose purpose is to prove CI passed.
         if not ci:
             return InvariantResult(
                 name=self.name,
-                status="warn",
-                details="no CI artifact JSON provided; cannot verify test results",
-                remediation=["re-run kernel with --ci-artifacts pointing to the CI output JSON"],
+                status="fail",
+                details="no CI artifact JSON provided; test evidence is unverifiable",
+                remediation=["provide complete CI artifact JSON and re-run the kernel"],
             )
 
         failures: list[str] = []

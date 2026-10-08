@@ -4,7 +4,13 @@ PROJECT-MONO | ALGA_FOLD_KERNEL | Node 001
 Gives Colony agents ability to commit code to GitHub.
 Every commit passes through OpenClaw governance.
 """
-import base64, hashlib, os, time, json, requests
+import base64
+import hashlib
+import json
+import os
+import time
+
+import requests
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum

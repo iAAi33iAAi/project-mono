@@ -196,3 +196,19 @@ def test_gpg_policy_malformed_fails_closed(tmp_path):
     )
 
     assert result.status in {"fail", "error"}
+
+
+def test_gpg_policy_missing_fails_closed(tmp_path):
+    from invariants.gpg_signature_check import GpgSignatureCheckInvariant
+
+    result = GpgSignatureCheckInvariant().evaluate(
+        {
+            "mode": "deploy",
+            "actor": "attacker",
+            "repo_root": tmp_path,
+            "ci_artifacts": {},
+        }
+    )
+
+    assert result.status in {"fail", "error"}
+    assert "missing" in result.details.lower()

@@ -118,6 +118,10 @@ class TestKernelE2E:
 
         ci = tmp_path / "ci.json"
         ci.write_text(json.dumps({"pytest": {"exit_code": 0}, "ruff": "pass", "mypy": "pass"}))
+        anomaly_file = tmp_path / "ops" / "embeddings" / "anomalies.json"
+        anomaly_file.parent.mkdir(parents=True, exist_ok=True)
+        anomaly_file.write_text("[]")
+
         ledger = tmp_path / "ledger.jsonl"
         rc = run(
             [

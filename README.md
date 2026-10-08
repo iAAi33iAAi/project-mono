@@ -2,7 +2,7 @@
 
 A unified monorepo consolidating **code, documentation, infrastructure, experiments, and data** into a single, navigable code tree.
 
-Includes the **ALGA_FOLD_KERNEL** governance runtime — a minimal trusted kernel that mediates every critical change, evaluates pluggable invariants, and records append-only decisions to the Knowledge Ledger.
+Includes the **ALGA_FOLD_KERNEL** governance runtime — a minimal trusted kernel that evaluates pluggable invariants and records decisions to the Knowledge Ledger. GitHub Actions currently uses it as the pull-request gate; the CLI also supports merge, deploy, and apply modes.
 
 ---
 
@@ -50,7 +50,7 @@ pytest tests/ -v
 
 ## ALGA_FOLD_KERNEL
 
-The kernel is the final gate for merges, deploys, and infra applies.
+The kernel is the repository's CI gate for pull requests and also provides CLI modes for merge, deploy, and apply workflows. Deployment/apply enforcement depends on invoking the kernel in the relevant operational pipeline.
 
 
 ```bash

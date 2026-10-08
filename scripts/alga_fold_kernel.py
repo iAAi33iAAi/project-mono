@@ -91,7 +91,8 @@ def _update_metrics(path, record):
         metrics["approvals"] += 1
     else:
         metrics["denials"] += 1
-    if record.get("emergency"):
+    # Count only actual approved emergency bypasses; denied emergency requests are not bypasses.
+    if record.get("emergency") and record.get("decision") == "approve":
         metrics["emergency_bypasses"] += 1
     for name, res in record["invariant_results"].items():
         if res["status"] in ("fail", "error"):

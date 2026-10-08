@@ -1,0 +1,25 @@
+name: Red Team Targeted Gate
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  targeted:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install -r requirements-dev.txt
+      - name: Run kernel regression tests
+        run: python -m pytest tests/test_kernel.py tests/test_redteam_fail_closed.py -q
+      - name: Lint changed security gate files
+        run: >
+          ruff check
+          scripts/alga_fold_kernel.py
+          invariants/tests_and_types.py
+          invariants/graph_anomaly_check.py
+          invariants/infra_plan_check.py
+          tests/test_redteam_fail_closed.py

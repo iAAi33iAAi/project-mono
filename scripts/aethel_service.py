@@ -102,7 +102,7 @@ def evaluate_change(
         errors.append("actor must be a non-empty string")
 
     mode = payload.get("mode", "merge")
-    if mode not in {"merge", "deploy", "apply"}:
+    if not isinstance(mode, str) or mode not in {"merge", "deploy", "apply"}:
         errors.append("mode must be merge, deploy, or apply")
 
     emergency = payload.get("emergency", False)
@@ -137,8 +137,35 @@ def evaluate_change(
         "repo_root": trusted_root,
     }
 
+    try:
+        invariants = load_invariants()
+    except Exception as exc:
+        return {
+            "protocol": PROTOCOL,
+            "service": SERVICE,
+            "version": VERSION,
+            "request_id": request_id,
+            "status": "ERROR",
+            "decision": "DENY",
+            "reasons": [f"invariant registry failed to load: {exc}"],
+            "result": {},
+            "evidence": {"persisted": False, "invariants_loaded": 0},
+        }
+    if not invariants:
+        return {
+            "protocol": PROTOCOL,
+            "service": SERVICE,
+            "version": VERSION,
+            "request_id": request_id,
+            "status": "FAIL",
+            "decision": "DENY",
+            "reasons": ["no invariants loaded; cannot approve the change"],
+            "result": {},
+            "evidence": {"persisted": False, "invariants_loaded": 0},
+        }
+
     results: list[InvariantResult] = []
-    for invariant in load_invariants():
+    for invariant in invariants:
         try:
             results.append(invariant.evaluate(ctx))
         except Exception as exc:

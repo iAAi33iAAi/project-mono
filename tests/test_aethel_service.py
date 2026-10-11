@@ -1,7 +1,4 @@
 """AETHEL interop service tests for fail-closed request handling."""
-import json
-from pathlib import Path
-
 import pytest
 
 import scripts.aethel_service as service

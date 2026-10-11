@@ -232,6 +232,26 @@ def test_gpg_policy_malformed_fails_closed(tmp_path):
     assert result.status in {"fail", "error"}
 
 
+def test_kernel_fails_closed_when_no_invariants_load(tmp_path, monkeypatch, capsys):
+    from scripts import alga_fold_kernel
+
+    monkeypatch.setattr(alga_fold_kernel, "load_invariants", lambda: [])
+    ledger = tmp_path / "ledger.jsonl"
+    rc = alga_fold_kernel.run([
+        "--pr", "101",
+        "--commit", "abc",
+        "--actor", "attacker",
+        "--mode", "merge",
+        "--repo-root", str(tmp_path),
+        "--ledger", str(ledger),
+        "--metrics", str(tmp_path / "metrics.json"),
+    ])
+
+    assert rc == 2
+    assert "no invariants loaded" in capsys.readouterr().err.lower()
+    assert not ledger.exists()
+
+
 def test_gpg_policy_missing_fails_closed(tmp_path):
     from invariants.gpg_signature_check import GpgSignatureCheckInvariant
 

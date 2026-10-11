@@ -118,7 +118,15 @@ def run(argv=None):
     except Exception as exc:
         print(f"[KERNEL ERROR] context build failed: {exc}", file=sys.stderr)
         return 2
-    invariants = load_invariants()
+    try:
+        invariants = load_invariants()
+    except Exception as exc:
+        print(f"[KERNEL ERROR] invariant registry load failed: {exc}", file=sys.stderr)
+        return 2
+    if not invariants:
+        print("[KERNEL ERROR] no invariants loaded; refusing to approve", file=sys.stderr)
+        return 2
+
     results = []
     start = time.monotonic_ns()
     for inv in invariants:

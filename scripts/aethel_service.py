@@ -48,10 +48,10 @@ def strict_json_loads(text: str):
 
 def persistence_authorized(authorization_header: str, configured_token: str | None = None) -> bool:
     """Return true only for an explicitly configured, constant-time bearer-token match."""
-    token = configured_token if configured_token is not None else os.getenv("AETHEL_KERNEL_PERSIST_TOKEN", "")
-    if not isinstance(token, str) or not token:
+    bearer_value = configured_token if configured_token is not None else os.getenv("AETHEL_KERNEL_PERSIST_TOKEN", "")
+    if not isinstance(bearer_value, str) or not bearer_value:
         return False
-    expected = f"Bearer {token}"
+    expected = f"Bearer {bearer_value}"
     return isinstance(authorization_header, str) and hmac.compare_digest(authorization_header, expected)
 
 
